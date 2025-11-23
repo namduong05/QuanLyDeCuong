@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace QuanLyDeCuong
@@ -9,7 +10,14 @@ namespace QuanLyDeCuong
         public frmLogin()
         {
             InitializeComponent();
+            foreach (Form f in Application.OpenForms.Cast<Form>().ToList())
+            {
+                if (f != this)
+                    f.Close();
+            }
         }
+
+
         private void btnLogin_Click(object sender, EventArgs e)
         {
             string user = txtUser.Text.Trim();
