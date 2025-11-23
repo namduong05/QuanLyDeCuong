@@ -33,6 +33,7 @@
             this.txtPass = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnLogin
@@ -83,11 +84,23 @@
             this.label2.TabIndex = 4;
             this.label2.Text = "Mật khẩu:";
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(152, 221);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(117, 18);
+            this.label3.TabIndex = 5;
+            this.label3.Text = "Quên mật khẩu?";
+            this.label3.Click += new System.EventHandler(this.label3_Click);
+            // 
             // frmLogin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(425, 229);
+            this.ClientSize = new System.Drawing.Size(425, 265);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtPass);
@@ -109,5 +122,6 @@
         private System.Windows.Forms.TextBox txtPass;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
     }
 }

@@ -97,10 +97,6 @@ namespace QuanLyDeCuong.FormThongTin
                         pbAvatar.Image = null;
                     }
                 }
-                else
-                {
-                    pbAvatar.Image = null;
-                }
             }
         }
 

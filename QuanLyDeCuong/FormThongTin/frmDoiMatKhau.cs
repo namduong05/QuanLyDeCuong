@@ -54,7 +54,9 @@ namespace QuanLyDeCuong.FormThongTin
                         txtPassCu.Text = "";
                         txtPassMoi.Text = "";
                         txtXacNhan.Text = "";
-
+                        this.Hide();
+                        frmLogin frmLogin = new frmLogin();
+                        frmLogin.ShowDialog();
                         this.Close();
                     }
                 }
