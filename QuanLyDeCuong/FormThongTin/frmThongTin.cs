@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Excel;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -10,8 +11,8 @@ namespace QuanLyDeCuong.FormThongTin
     public partial class frmThongTin : Form
     {
         // Thư mục lưu Avatar
-        private string avatarFolder = @"C:\Syllabus\Avatars\";
-        private string currentAvatarPath = "";
+        private string avatarFolder = Path.Combine(Application.StartupPath, "Avatars");
+        private string currentAvatarFileName = "";
 
         public frmThongTin()
         {
@@ -74,15 +75,50 @@ namespace QuanLyDeCuong.FormThongTin
                 }
 
                 // Load Avatar
-                string avatarDbPath = row["Avatar"].ToString();
-                if (!string.IsNullOrEmpty(avatarDbPath) && File.Exists(avatarDbPath))
+                string avatarDbValue = row["Avatar"].ToString();
+
+                if (!string.IsNullOrEmpty(avatarDbValue))
                 {
-                    pbAvatar.Image = Image.FromFile(avatarDbPath);
-                    currentAvatarPath = avatarDbPath;
+                    string fileName = Path.GetFileName(avatarDbValue);
+                    string localPath = Path.Combine(avatarFolder, fileName);
+
+                    // Ưu tiên load từ thư mục Avatars trong project
+                    if (File.Exists(localPath))
+                    {
+                        LoadImageSafe(localPath);
+                        currentAvatarFileName = fileName;
+                    }
+                    // Dự phòng cho dữ liệu cũ (đường dẫn tuyệt đối)
+                    else if (File.Exists(avatarDbValue))
+                    {
+                        LoadImageSafe(avatarDbValue);
+                    }
+                    else
+                    {
+                        pbAvatar.Image = null;
+                    }
+                }
+                else
+                {
+                    pbAvatar.Image = null;
                 }
             }
         }
 
+        // Hàm tiện ích load ảnh an toàn không khóa file
+        private void LoadImageSafe(string path)
+        {
+            try
+            {
+                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {
+                    pbAvatar.Image = Image.FromStream(fs);
+                }
+            }
+            catch { pbAvatar.Image = null; }
+        }
+
+        // 2. Chọn ảnh đại diện
         private void btnChonAnh_Click(object sender, EventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
@@ -91,11 +127,12 @@ namespace QuanLyDeCuong.FormThongTin
             {
                 try
                 {
-                    // Hiển thị
-                    pbAvatar.Image = Image.FromFile(dlg.FileName);
-
-                    // Lưu đường dẫn tạm
-                    pbAvatar.Tag = dlg.FileName;
+                    // Hiển thị preview dùng stream để không khóa file gốc
+                    using (FileStream fs = new FileStream(dlg.FileName, FileMode.Open, FileAccess.Read))
+                    {
+                        pbAvatar.Image = Image.FromStream(fs);
+                    }
+                    pbAvatar.Tag = dlg.FileName; // Lưu đường dẫn tạm
                 }
                 catch (Exception ex)
                 {
@@ -104,6 +141,7 @@ namespace QuanLyDeCuong.FormThongTin
             }
         }
 
+        // 3. Lưu cập nhật
         private void btnLuu_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txtHoTen.Text))
@@ -112,33 +150,51 @@ namespace QuanLyDeCuong.FormThongTin
                 return;
             }
 
-            // Xử lý Avatar: Nếu người dùng có chọn ảnh mới (Tag chứa đường dẫn file gốc)
-            string finalAvatarPath = currentAvatarPath;
+            string finalFileName = currentAvatarFileName;
 
+            // XỬ LÝ LƯU ẢNH VÀ XÓA ẢNH CŨ
             if (pbAvatar.Tag != null)
             {
                 string sourceFile = pbAvatar.Tag.ToString();
-                string fileName = Path.GetFileName(sourceFile);
-                string destFile = Path.Combine(avatarFolder, UserSession.TenDangNhap + "_" + fileName);
+                string ext = Path.GetExtension(sourceFile);
+                string newFileName = $"{UserSession.TenDangNhap}_{UserSession.TenDangNhap}{ext}";
+                string destPath = Path.Combine(avatarFolder, newFileName);
 
                 try
                 {
-                    // Giải phóng ảnh cũ khỏi PictureBox để tránh lỗi file đang được sử dụng nếu đè file
-                    if (pbAvatar.Image != null) pbAvatar.Image.Dispose();
+                    // 1. Giải phóng ảnh đang hiện trên PictureBox (quan trọng để xóa được nếu trùng tên)
+                    if (pbAvatar.Image != null)
+                    {
+                        pbAvatar.Image.Dispose();
+                        pbAvatar.Image = null;
+                    }
 
-                    File.Copy(sourceFile, destFile, true);
-                    finalAvatarPath = destFile;
+                    // 2. Xóa ảnh cũ (nếu có và khác null)
+                    if (!string.IsNullOrEmpty(currentAvatarFileName))
+                    {
+                        string oldFullPath = Path.Combine(avatarFolder, currentAvatarFileName);
+                        if (File.Exists(oldFullPath))
+                        {
+                            try { File.Delete(oldFullPath); }
+                            catch { /* Nếu không xóa được file rác thì bỏ qua, không crash app */ }
+                        }
+                    }
 
-                    // Load lại ảnh vào PictureBox từ đường dẫn mới
-                    pbAvatar.Image = Image.FromFile(finalAvatarPath);
+                    // 3. Copy ảnh mới
+                    File.Copy(sourceFile, destPath, true);
+                    finalFileName = newFileName;
+
+                    // 4. Load lại ảnh mới vào PictureBox để hiển thị tiếp (Dùng Stream để không khóa file mới)
+                    LoadImageSafe(destPath);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Lỗi lưu ảnh: " + ex.Message);
+                    MessageBox.Show("Lỗi xử lý file ảnh: " + ex.Message);
                     return;
                 }
             }
 
+            // Cập nhật Database
             DbQLDC db = new DbQLDC();
             string query = @"UPDATE NguoiDung 
                              SET HoTen=@ten, Email=@email, SoDT=@sodt, DiaChi=@diachi, 
@@ -153,7 +209,7 @@ namespace QuanLyDeCuong.FormThongTin
             p.Add("@diachi", txtDiaChi.Text.Trim());
             p.Add("@ns", dtpNgaySinh.Value);
             p.Add("@gt", cbGioiTinh.Text);
-            p.Add("@avatar", finalAvatarPath);
+            p.Add("@avatar", finalFileName); // Chỉ lưu tên file
 
             if (db.ExecuteNonQuery(query, p))
             {
@@ -161,7 +217,7 @@ namespace QuanLyDeCuong.FormThongTin
                 UserSession.HoTen = txtHoTen.Text;
 
                 pbAvatar.Tag = null;
-                currentAvatarPath = finalAvatarPath;
+                currentAvatarFileName = finalFileName;
             }
         }
 

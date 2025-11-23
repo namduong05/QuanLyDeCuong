@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
-            this.btnXem = new System.Windows.Forms.Button();
+            this.btnTaiVe = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.txtTenFile = new System.Windows.Forms.TextBox();
             this.txtSearch = new System.Windows.Forms.TextBox();
@@ -42,7 +42,7 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.btnXem);
+            this.panel1.Controls.Add(this.btnTaiVe);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.txtTenFile);
             this.panel1.Controls.Add(this.txtSearch);
@@ -54,17 +54,17 @@
             this.panel1.Size = new System.Drawing.Size(1072, 195);
             this.panel1.TabIndex = 0;
             // 
-            // btnXem
+            // btnTaiVe
             // 
-            this.btnXem.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnXem.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnXem.Location = new System.Drawing.Point(774, 149);
-            this.btnXem.Name = "btnXem";
-            this.btnXem.Size = new System.Drawing.Size(101, 31);
-            this.btnXem.TabIndex = 11;
-            this.btnXem.Text = "Xem";
-            this.btnXem.UseVisualStyleBackColor = true;
-            this.btnXem.Click += new System.EventHandler(this.btnXem_Click);
+            this.btnTaiVe.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnTaiVe.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnTaiVe.Location = new System.Drawing.Point(774, 149);
+            this.btnTaiVe.Name = "btnTaiVe";
+            this.btnTaiVe.Size = new System.Drawing.Size(101, 31);
+            this.btnTaiVe.TabIndex = 11;
+            this.btnTaiVe.Text = "Tải về";
+            this.btnTaiVe.UseVisualStyleBackColor = true;
+            this.btnTaiVe.Click += new System.EventHandler(this.btnTaiVe_Click);
             // 
             // label3
             // 
@@ -120,6 +120,8 @@
             // 
             // dgvDeCuong
             // 
+            this.dgvDeCuong.AllowUserToAddRows = false;
+            this.dgvDeCuong.AllowUserToDeleteRows = false;
             this.dgvDeCuong.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -155,7 +157,7 @@
         #endregion
 
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button btnXem;
+        private System.Windows.Forms.Button btnTaiVe;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtTenFile;
         private System.Windows.Forms.TextBox txtSearch;

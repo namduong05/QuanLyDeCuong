@@ -9,6 +9,7 @@ namespace QuanLyDeCuong.FormThongTin
 {
     public partial class frmDeCuong : Form
     {
+        private string projectFolder = Path.Combine(Application.StartupPath, "SyllabusData");
         public frmDeCuong()
         {
             InitializeComponent();
@@ -44,6 +45,8 @@ namespace QuanLyDeCuong.FormThongTin
             if (dgvDeCuong.Columns["TacGia"] != null) dgvDeCuong.Columns["TacGia"].HeaderText = "Giảng Viên";
             if (dgvDeCuong.Columns["TenFile"] != null) dgvDeCuong.Columns["TenFile"].HeaderText = "Tên File";
             if (dgvDeCuong.Columns["NgayCapNhat"] != null) dgvDeCuong.Columns["NgayCapNhat"].HeaderText = "Ngày Cập Nhật";
+
+            dgvDeCuong.RowHeadersVisible = false;
         }
 
         // Chức năng Tìm Kiếm
@@ -66,31 +69,58 @@ namespace QuanLyDeCuong.FormThongTin
             dgvDeCuong.DataSource = db.GetDataTable(query, p);
         }
 
-        // Xem File
-        private void btnXem_Click(object sender, EventArgs e)
+        // tải File
+        private void btnTaiVe_Click(object sender, EventArgs e)
         {
             if (dgvDeCuong.CurrentRow == null)
             {
-                MessageBox.Show("Vui lòng chọn một đề cương để xem!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Vui lòng chọn đề cương cần tải!", "Thông báo");
                 return;
             }
 
-            string filePath = dgvDeCuong.CurrentRow.Cells["DuongDanFile"].Value.ToString();
+            string fileName = dgvDeCuong.CurrentRow.Cells["TenFile"].Value.ToString();
 
-            if (File.Exists(filePath))
+            // SỬA ĐỔI: Tìm file nguồn tương tự như nút Xem
+            string localPath = Path.Combine(projectFolder, fileName);
+            string dbPath = dgvDeCuong.CurrentRow.Cells["DuongDanFile"].Value.ToString();
+            string sourcePath = "";
+
+            if (File.Exists(localPath)) sourcePath = localPath;
+            else if (File.Exists(dbPath)) sourcePath = dbPath;
+
+            if (string.IsNullOrEmpty(sourcePath))
+            {
+                MessageBox.Show("File gốc không tồn tại trên hệ thống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Mở hộp thoại Save File cho người dùng chọn nơi lưu
+            SaveFileDialog saveDlg = new SaveFileDialog();
+            saveDlg.FileName = fileName;
+            saveDlg.Filter = "All Files|*.*";
+
+            string ext = Path.GetExtension(fileName);
+            if (!string.IsNullOrEmpty(ext))
+            {
+                saveDlg.Filter = $"{ext.ToUpper()} File|*{ext}|All Files|*.*";
+            }
+
+            if (saveDlg.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+                    File.Copy(sourcePath, saveDlg.FileName, true);
+                    MessageBox.Show("Tải về thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    if (MessageBox.Show("Bạn có muốn mở file vừa tải không?", "Mở file", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        Process.Start(new ProcessStartInfo(saveDlg.FileName) { UseShellExecute = true });
+                    }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Không thể mở file: " + ex.Message);
+                    MessageBox.Show("Lỗi khi lưu file: " + ex.Message);
                 }
-            }
-            else
-            {
-                MessageBox.Show("File không tồn tại hoặc đã bị xóa khỏi hệ thống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

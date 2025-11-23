@@ -9,7 +9,7 @@ namespace QuanLyDeCuong.FormQuanLy
 {
     public partial class frmQLDC : Form
     {
-        private string saveFolder = @"C:\Syllabus\";
+        private string saveFolder = Path.Combine(Application.StartupPath, "SyllabusData");
         private string currentSourceFilePath = ""; // Lưu đường dẫn file tạm khi chọn
 
         public frmQLDC()
@@ -61,7 +61,7 @@ namespace QuanLyDeCuong.FormQuanLy
                 JOIN MonHoc mh ON dc.MaMonHoc = mh.MaMonHoc";
             if(UserSession.VaiTro == "Giảng viên")
             {
-                query += $" WHERE dc.TacGia LIKE '{UserSession.HoTen}'";
+                query += $" WHERE dc.TacGia LIKE N'{UserSession.HoTen}'";
             }
 
             DataTable dt = db.GetDataTable(query);
@@ -100,7 +100,7 @@ namespace QuanLyDeCuong.FormQuanLy
 
             string fileName = Path.GetFileName(currentSourceFilePath);
             // Thêm timestamp để tránh trùng tên file: DeCuong_20231122_abc.pdf
-            string uniqueFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{DateTime.Now.Ticks}{Path.GetExtension(fileName)}";
+            string uniqueFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{UserSession.TenDangNhap}{Path.GetExtension(fileName)}";
             string destPath = Path.Combine(saveFolder, uniqueFileName);
 
             try
@@ -151,7 +151,7 @@ namespace QuanLyDeCuong.FormQuanLy
             if (!string.IsNullOrEmpty(currentSourceFilePath)) // Có chọn file mới
             {
                 string fileName = Path.GetFileName(currentSourceFilePath);
-                string uniqueFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{DateTime.Now.Ticks}{Path.GetExtension(fileName)}";
+                string uniqueFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{UserSession.TenDangNhap}{Path.GetExtension(fileName)}";
                 string destPath = Path.Combine(saveFolder, uniqueFileName);
                 try
                 {

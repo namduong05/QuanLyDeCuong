@@ -195,10 +195,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\DatabaseQLDC.mdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\DatabaseQLDC_log.ldf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>DatabaseQLDC.mdf</DependentUpon>
     </Content>
     <None Include="Resources\defaultAvatar.jpg" />
